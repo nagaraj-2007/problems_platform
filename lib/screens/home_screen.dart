@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
-import 'data_service.dart';
-import 'components.dart';
+import '../models/models.dart';
+import '../services/data_service.dart';
+import '../widgets/components.dart';
 import 'problem_preview_screen.dart';
 import 'problem_list_screen.dart';
 import 'post_problem_screen.dart';
 import 'profile_screen.dart';
 import 'category_problems_screen.dart';
-import 'theme.dart';
+import '../utils/theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   List<String> _filteredCategories = [];
+  String? _selectedCategory;
   late AnimationController _fadeController;
 
   @override
@@ -45,9 +46,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     // Determine screen width to adjust layout (if we were doing responsive web, but focused on mobile feel here)
     final dataService = DataService();
-    // Use dataService variables to avoid 'unused variable' warnings if needed, 
-    // but here we just need the data call.
-    final problems = dataService.getProblems().take(5).toList();
+    // Filter problems based on selected category
+    final allProblems = dataService.getProblems();
+    final problems = _selectedCategory == null 
+        ? allProblems.take(5).toList()
+        : allProblems.where((p) => p.category == _selectedCategory).take(5).toList();
 
     return Scaffold(
       body: CustomScrollView(
@@ -211,20 +214,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 margin: const EdgeInsets.only(right: 12),
                 child: InkWell(
                   onTap: () {
-                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CategoryProblemsScreen(category: category),
-                        ),
-                      );
+                    setState(() {
+                      _selectedCategory = _selectedCategory == category ? null : category;
+                    });
                   },
                   borderRadius: BorderRadius.circular(25),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: _selectedCategory == category ? AppTheme.primaryColor : Colors.white,
                       borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: AppTheme.borderColor),
+                      border: Border.all(color: _selectedCategory == category ? AppTheme.primaryColor : AppTheme.borderColor),
                       boxShadow: [
                         BoxShadow(
                           color: AppTheme.textSecondary.withOpacity(0.05),
@@ -235,9 +235,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     child: Text(
                       category,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: _selectedCategory == category ? Colors.white : AppTheme.textPrimary,
                       ),
                     ),
                   ),
@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: Row(
         children: [
           Text(
-            'Trending Problems',
+            _selectedCategory == null ? 'Trending Problems' : '$_selectedCategory Problems',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 20),
           ),
           const Spacer(),

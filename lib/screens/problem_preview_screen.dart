@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'data_service.dart';
-import 'components.dart';
+import '../services/data_service.dart';
+import '../widgets/components.dart';
 import 'problem_detail_screen.dart';
 
 class ProblemPreviewScreen extends StatelessWidget {
@@ -33,7 +33,7 @@ class ProblemPreviewScreen extends StatelessWidget {
           Expanded(
             flex: 3,
             child: problem.imageUrl != null
-                ? Image.network(
+                ? Image.asset(
                     problem.imageUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),

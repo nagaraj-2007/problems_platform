@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'data_service.dart';
-import 'components.dart';
+import '../services/data_service.dart';
+import '../widgets/components.dart';
 import 'problem_preview_screen.dart';
 
 class ProblemListScreen extends StatefulWidget {

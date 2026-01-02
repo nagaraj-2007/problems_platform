@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'data_service.dart';
+import '../models/models.dart';
+import '../services/data_service.dart';
 import 'problem_preview_screen.dart';
 
 class CategoryProblemsScreen extends StatelessWidget {

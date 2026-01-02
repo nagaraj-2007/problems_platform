@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
-import 'data_service.dart';
-import 'components.dart';
+import '../models/models.dart';
+import '../services/data_service.dart';
+import '../widgets/components.dart';
 import 'submit_plan_screen.dart';
-import 'theme.dart';
+import '../utils/theme.dart';
 
 class ProblemDetailScreen extends StatelessWidget {
   final String problemId;
@@ -64,7 +64,7 @@ class ProblemDetailScreen extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
+                        Image.asset(
                           problem.imageUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => 
@@ -76,7 +76,7 @@ class ProblemDetailScreen extends StatelessWidget {
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.7),
+                                color: Colors.black.withValues(alpha: 0.7),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white, width: 2),
                               ),
@@ -312,7 +312,7 @@ class ProblemDetailScreen extends StatelessWidget {
                   rating: rating.rating,
                   comment: rating.comment,
                   createdAt: rating.createdAt,
-                )).toList(),
+                )),
             ],
           ),
         ),

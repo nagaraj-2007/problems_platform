@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'theme.dart';
+import 'screens/home_screen.dart';
+import 'utils/theme.dart';
 
 void main() {
   runApp(const ProblemPlatformApp());

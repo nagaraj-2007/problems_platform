@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
-import 'theme.dart';
+import '../models/models.dart';
+import '../utils/theme.dart';
 
 class ProblemCard extends StatelessWidget {
   final Problem problem;
@@ -30,7 +30,7 @@ class ProblemCard extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                      child: Image.network(
+                      child: Image.asset(
                         problem.imageUrl!,
                         height: 200,
                         width: double.infinity,

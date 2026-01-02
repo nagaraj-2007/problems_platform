@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'data_service.dart';
+import '../models/models.dart';
+import '../services/data_service.dart';
 import 'category_problems_screen.dart';
 
 class CategoryOverviewScreen extends StatelessWidget {
@@ -144,7 +145,7 @@ class CategoryOverviewScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                '${category.totalPlans} total plans',
+                '${category.totalPlans.toInt()} total plans',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 14,
@@ -165,7 +166,7 @@ class CategoryOverviewScreen extends StatelessWidget {
         stats[problem.category] = CategoryStats(
           name: problem.category,
           problemCount: 0,
-          totalPlans: 0,
+          totalPlans: 0.0,
         );
       }
       stats[problem.category]!.problemCount++;
@@ -239,7 +240,7 @@ class CategoryOverviewScreen extends StatelessWidget {
 class CategoryStats {
   final String name;
   int problemCount;
-  int totalPlans;
+  double totalPlans;
 
   CategoryStats({
     required this.name,

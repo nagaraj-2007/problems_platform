@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
-import 'data_service.dart';
+import '../models/models.dart';
+import '../services/data_service.dart';
 
 class SubmitPlanScreen extends StatefulWidget {
   final Problem problem;
