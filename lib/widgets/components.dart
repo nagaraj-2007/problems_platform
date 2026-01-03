@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../utils/theme.dart';
+import '../utils/linkedin_theme.dart';
 
 class ProblemCard extends StatelessWidget {
   final Problem problem;
@@ -11,159 +11,135 @@ class ProblemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [AppTheme.softShadow],
-      ),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (problem.imageUrl != null)
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                      child: Image.asset(
-                        problem.imageUrl!,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                           return Container(
-                             height: 200, 
-                             color: Colors.grey.shade200,
-                             child: const Center(child: Icon(Icons.image_not_supported, color: Colors.grey)),
-                           );
-                        },
+      decoration: LinkedInTheme.cardDecoration,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (problem.imageUrl != null)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                child: Image.asset(
+                  problem.imageUrl!,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 160,
+                      color: LinkedInTheme.backgroundGray,
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported, color: LinkedInTheme.textTertiary),
                       ),
-                    ),
-                    if (problem.videoUrl != null)
-                      Positioned.fill(
-                        child: Center(
-                          child: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.6),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(Icons.play_arrow, color: Colors.white, size: 30),
-                          ),
-                        ),
-                      ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: CategoryTag(category: problem.category),
-                    ),
-                  ],
-                ),
-              
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (problem.imageUrl == null) ...[
-                       CategoryTag(category: problem.category),
-                       const SizedBox(height: 12),
-                    ],
-                    Text(
-                      problem.title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0F172A),
-                        height: 1.3,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      problem.context,
-                      style: const TextStyle(
-                        color: Color(0xFF64748B),
-                        height: 1.6,
-                        fontSize: 15,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 12,
-                          backgroundColor: const Color(0xFF6366F1),
-                          child: Text(
-                             problem.authorName[0], 
-                             style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                         const SizedBox(width: 8),
-                         Text(
-                          problem.authorName,
-                          style: const TextStyle(
-                            color: Color(0xFF64748B),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Spacer(),
-                        _buildStatChip(
-                          icon: Icons.remove_red_eye_outlined,
-                          label: '${problem.viewCount}',
-                          color: const Color(0xFF64748B),
-                        ),
-                        const SizedBox(width: 12),
-                        _buildStatChip(
-                          icon: Icons.lightbulb_outline,
-                          label: '${problem.planCount}',
-                          color: const Color(0xFFEAB308),
-                        ),
-                      ],
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
-            ],
-          ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CategoryTag(category: problem.category),
+                      const Spacer(),
+                      Text(
+                        _formatDate(problem.createdAt),
+                        style: LinkedInTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    problem.title,
+                    style: LinkedInTheme.heading3,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    problem.context,
+                    style: LinkedInTheme.bodyMedium,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: LinkedInTheme.primaryBlue,
+                        child: Text(
+                          problem.authorName[0],
+                          style: const TextStyle(
+                            color: LinkedInTheme.cardWhite,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        problem.authorName,
+                        style: LinkedInTheme.bodySmall.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Spacer(),
+                      _buildStatChip(
+                        icon: Icons.visibility_outlined,
+                        label: '${problem.viewCount}',
+                      ),
+                      const SizedBox(width: 8),
+                      _buildStatChip(
+                        icon: Icons.lightbulb_outline,
+                        label: '${problem.planCount}',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildStatChip({required IconData icon, required String label, required Color color}) {
+  Widget _buildStatChip({required IconData icon, required String label}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: LinkedInTheme.backgroundGray,
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
+          Icon(icon, size: 12, color: LinkedInTheme.textSecondary),
+          const SizedBox(width: 2),
           Text(
             label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+            style: const TextStyle(
+              color: LinkedInTheme.textSecondary,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+    if (difference.inDays > 0) return '${difference.inDays}d';
+    if (difference.inHours > 0) return '${difference.inHours}h';
+    return '${difference.inMinutes}m';
   }
 }
 
@@ -303,40 +279,22 @@ class CategoryTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _getCategoryColor(category);
-    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.1), color.withValues(alpha: 0.05)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        color: LinkedInTheme.lightBlue,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: LinkedInTheme.primaryBlue.withOpacity(0.3)),
       ),
       child: Text(
         category,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
+        style: const TextStyle(
+          color: LinkedInTheme.primaryBlue,
+          fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
       ),
     );
-  }
-
-  Color _getCategoryColor(String category) {
-    final colors = [
-      const Color(0xFF6366F1),
-      const Color(0xFF10B981),
-      const Color(0xFFF59E0B),
-      const Color(0xFFEF4444),
-      const Color(0xFF8B5CF6),
-      const Color(0xFF06B6D4),
-      const Color(0xFFEC4899),
-      const Color(0xFF84CC16),
-    ];
-    return colors[category.hashCode.abs() % colors.length];
   }
 }
 

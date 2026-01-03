@@ -27,24 +27,24 @@ class ProblemPreviewScreen extends StatelessWidget {
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        children: [
-          // Image/Video Section
-          Expanded(
-            flex: 3,
-            child: problem.imageUrl != null
-                ? Image.asset(
-                    problem.imageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
-                  )
-                : _buildPlaceholder(),
-          ),
-          
-          // Content Preview Section
-          Expanded(
-            flex: 1,
-            child: Container(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Image/Video Section
+            Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: problem.imageUrl != null
+                  ? Image.asset(
+                      problem.imageUrl!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+                    )
+                  : _buildPlaceholder(),
+            ),
+            
+            // Content Preview Section
+            Container(
               width: double.infinity,
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -74,64 +74,53 @@ class ProblemPreviewScreen extends StatelessWidget {
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProblemDetailScreen(problemId: problem.id),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProblemDetailScreen(problemId: problem.id),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          problem.context,
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            height: 1.4,
                           ),
-                        );
-                      },
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                        SizedBox(height: 16),
+                        Row(
                           children: [
-                            Expanded(
-                              child: Text(
-                                problem.context,
-                                style: TextStyle(
-                                  color: Colors.grey.shade700,
-                                  height: 1.4,
-                                ),
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              'Tap to read more',
+                              style: TextStyle(
+                                color: Colors.blue.shade600,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Text(
-                                  'Tap to read more',
-                                  style: TextStyle(
-                                    color: Colors.blue.shade600,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 12,
-                                  color: Colors.blue.shade600,
-                                ),
-                              ],
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 12,
+                              color: Colors.blue.shade600,
                             ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

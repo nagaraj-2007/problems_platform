@@ -93,15 +93,13 @@ class ProblemDetailScreen extends StatelessWidget {
               Row(
                 children: [
                   CategoryTag(category: problem.category),
-                  const SizedBox(width: 16),
-                  Text(
-                    'Posted by ${problem.authorName}',
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    _formatDate(problem.createdAt),
-                    style: TextStyle(color: Colors.grey.shade600),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Posted by ${problem.authorName} • ${_formatDate(problem.createdAt)}',
+                      style: TextStyle(color: Colors.grey.shade600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
@@ -127,14 +125,15 @@ class ProblemDetailScreen extends StatelessWidget {
               // Problem Reviews Section
               Row(
                 children: [
-                  const Text(
-                    'Problem Reviews',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                  const Expanded(
+                    child: Text(
+                      'Problem Reviews',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
                   Text(
                     '(${problemReviews.length})',
                     style: TextStyle(
@@ -143,7 +142,7 @@ class ProblemDetailScreen extends StatelessWidget {
                       color: Colors.grey.shade500
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   if (canReviewProblem)
                     TextButton(
                       onPressed: () => _showReviewDialog(context, problem),
@@ -184,14 +183,15 @@ class ProblemDetailScreen extends StatelessWidget {
               // Plans Section
               Row(
                 children: [
-                  const Text(
-                    'Plans',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                  const Expanded(
+                    child: Text(
+                      'Plans',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
                    Text(
                     '(${plans.length})',
                     style: TextStyle(
@@ -200,7 +200,7 @@ class ProblemDetailScreen extends StatelessWidget {
                       color: Colors.grey.shade500
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   if (canSubmitPlan)
                     TextButton(
                       onPressed: () {
