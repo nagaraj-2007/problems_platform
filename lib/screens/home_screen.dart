@@ -46,9 +46,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: LinkedInTheme.backgroundGray,
+      drawer: _buildDrawer(context),
       appBar: AppBar(
         backgroundColor: LinkedInTheme.cardWhite,
         elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: CircleAvatar(
+              radius: 16,
+              backgroundColor: LinkedInTheme.lightBlue,
+              child: const Icon(Icons.person_outline, color: LinkedInTheme.primaryBlue, size: 18),
+            ),
+          ),
+        ),
         title: Row(
           children: [
             Image.asset(
@@ -60,22 +73,6 @@ class _HomeScreenState extends State<HomeScreen> {
             const Text('BrainLift', style: LinkedInTheme.heading2),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
-            },
-            icon: CircleAvatar(
-              radius: 16,
-              backgroundColor: LinkedInTheme.lightBlue,
-              child: const Icon(Icons.person_outline, color: LinkedInTheme.primaryBlue, size: 18),
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: LinkedInTheme.borderGray),
@@ -101,6 +98,79 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: LinkedInTheme.primaryBlue,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Post Problem', style: LinkedInTheme.buttonText),
+      ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              color: LinkedInTheme.primaryBlue,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, size: 40, color: LinkedInTheme.primaryBlue),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'User Profile',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'user@example.com',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text('My Profile'),
+            onTap: () {
+              Navigator.pop(context); // Close drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: const Text('Settings'),
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Settings coming soon')),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+            onTap: () {
+              // Sign out logic
+              Navigator.pop(context);
+              Navigator.of(context).pushReplacementNamed('/');
+            },
+          ),
+        ],
       ),
     );
   }

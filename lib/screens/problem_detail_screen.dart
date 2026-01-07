@@ -3,21 +3,26 @@ import '../models/models.dart';
 import '../services/data_service.dart';
 import '../widgets/components.dart';
 import 'submit_plan_screen.dart';
-import '../utils/theme.dart';
+import '../utils/linkedin_theme.dart';
 
-class ProblemDetailScreen extends StatelessWidget {
+class ProblemDetailScreen extends StatefulWidget {
   final String problemId;
 
   const ProblemDetailScreen({super.key, required this.problemId});
 
   @override
+  State<ProblemDetailScreen> createState() => _ProblemDetailScreenState();
+}
+
+class _ProblemDetailScreenState extends State<ProblemDetailScreen> {
+  @override
   Widget build(BuildContext context) {
     final dataService = DataService();
-    final problem = dataService.getProblem(problemId);
-    final plans = dataService.getPlansForProblem(problemId);
-    final problemReviews = dataService.getProblemReviews(problemId);
-    final canSubmitPlan = dataService.canSubmitPlan(problemId);
-    final canReviewProblem = dataService.canReviewProblem(problemId);
+    final problem = dataService.getProblem(widget.problemId);
+    final plans = dataService.getPlansForProblem(widget.problemId);
+    final problemReviews = dataService.getProblemReviews(widget.problemId);
+    final canSubmitPlan = dataService.canSubmitPlan(widget.problemId);
+    final canReviewProblem = dataService.canReviewProblem(widget.problemId);
 
     if (problem == null) {
       return Scaffold(
@@ -32,6 +37,16 @@ class ProblemDetailScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Share functionality coming soon')),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -51,40 +66,57 @@ class ProblemDetailScreen extends StatelessWidget {
               const SizedBox(height: 24),
               
               // Media Section
-              if (problem.imageUrl != null) ...[
-                Container(
-                  width: double.infinity,
+              if (problem.imageUrls.isNotEmpty || problem.videoUrls.isNotEmpty) ...[
+                SizedBox(
                   height: 250,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [AppTheme.softShadow], 
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(
-                          problem.imageUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => 
-                              Container(color: Colors.grey.shade200, child: const Center(child: Icon(Icons.error))),
-                        ),
-                        if (problem.videoUrl != null)
-                          Center(
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.7),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
-                              ),
-                              child: const Icon(Icons.play_arrow, color: Colors.white, size: 36),
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: problem.imageUrls.length + problem.videoUrls.length,
+                    separatorBuilder: (context, index) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      if (index < problem.imageUrls.length) {
+                        // Image
+                        return Container(
+                          width: 300,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [LinkedInTheme.cardShadow],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              problem.imageUrls[index],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => 
+                                  Container(color: Colors.grey.shade200, child: const Center(child: Icon(Icons.error))),
                             ),
                           ),
-                      ],
-                    ),
+                        );
+                      } else {
+                        // Video Placeholder
+                        return Container(
+                          width: 300,
+                          decoration: BoxDecoration(
+                            color: Colors.black87,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [LinkedInTheme.cardShadow],
+                          ),
+                          child: const Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.play_circle_fill, color: Colors.white, size: 48),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Video',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -120,6 +152,35 @@ class ProblemDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              
+              // Like Action
+              Row(
+                children: [
+                  _buildActionButton(
+                    icon: problem.isLiked ? Icons.favorite : Icons.favorite_border,
+                    label: '${problem.likeCount} Likes',
+                    color: problem.isLiked ? Colors.pink : Colors.grey.shade600,
+                    onTap: () {
+                      setState(() {
+                        dataService.likeProblem(problem.id);
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 16),
+                   _buildActionButton(
+                    icon: Icons.share_outlined,
+                    label: 'Share',
+                    color: Colors.grey.shade600,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Share functionality coming soon')),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              
               const SizedBox(height: 40),
 
               // Problem Reviews Section
@@ -262,6 +323,36 @@ class ProblemDetailScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20, color: color),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPlanWithRatings(BuildContext context, Plan plan) {
     final dataService = DataService();
     final planRatings = dataService.getPlanRatings(plan.id);
@@ -321,7 +412,6 @@ class ProblemDetailScreen extends StatelessWidget {
   }
 
   void _showReviewDialog(BuildContext context, Problem problem) {
-    // Simple rating dialog - in real app would be more sophisticated
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -342,7 +432,6 @@ class ProblemDetailScreen extends StatelessWidget {
   }
 
   void _showRatingDialog(BuildContext context, Plan plan) {
-    // Simple rating dialog - in real app would be more sophisticated
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

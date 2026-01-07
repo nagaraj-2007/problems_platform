@@ -18,10 +18,10 @@ class _PostProblemScreenState extends State<PostProblemScreen> {
   final _titleController = TextEditingController();
   final _contextController = TextEditingController();
   String? _selectedCategory;
-  File? _selectedImage;
-  File? _selectedVideo;
-  String? _selectedImagePath;
-  String? _selectedVideoPath;
+  
+  final List<XFile> _selectedImages = [];
+  final List<XFile> _selectedVideos = [];
+  
   final ImagePicker _picker = ImagePicker();
 
   bool get _isFormValid {
@@ -83,6 +83,10 @@ class _PostProblemScreenState extends State<PostProblemScreen> {
                       decoration: LinkedInTheme.inputDecoration(
                         'Clearly describe the problem in one sentence',
                       ),
+                      validator: (value) {
+                         if (value == null || value.trim().isEmpty) return 'Title is required';
+                         return null;
+                      },
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 20),
@@ -108,6 +112,10 @@ class _PostProblemScreenState extends State<PostProblemScreen> {
                       decoration: LinkedInTheme.inputDecoration(
                         'Provide detailed context and background information',
                       ),
+                      validator: (value) {
+                         if (value == null || value.trim().isEmpty) return 'Context is required';
+                         return null;
+                      },
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 20),
@@ -117,93 +125,126 @@ class _PostProblemScreenState extends State<PostProblemScreen> {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _showImageSourceDialog(),
+                            onPressed: () => _pickImages(),
                             icon: const Icon(Icons.image, size: 18),
-                            label: Text(_selectedImagePath != null ? 'Image Selected' : 'Add Image'),
+                            label: const Text('Add Images'),
                             style: LinkedInTheme.secondaryButton.copyWith(
-                              foregroundColor: WidgetStateProperty.all(
-                                _selectedImagePath != null ? LinkedInTheme.successGreen : LinkedInTheme.primaryBlue,
-                              ),
-                              side: WidgetStateProperty.all(
-                                BorderSide(
-                                  color: _selectedImagePath != null ? LinkedInTheme.successGreen : LinkedInTheme.primaryBlue,
-                                ),
-                              ),
+                              foregroundColor: WidgetStateProperty.all(LinkedInTheme.primaryBlue),
+                              side: WidgetStateProperty.all(const BorderSide(color: LinkedInTheme.primaryBlue)),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _showVideoSourceDialog(),
+                            onPressed: () => _pickVideo(),
                             icon: const Icon(Icons.videocam, size: 18),
-                            label: Text(_selectedVideoPath != null ? 'Video Selected' : 'Add Video'),
+                            label: const Text('Add Video'),
                             style: LinkedInTheme.secondaryButton.copyWith(
-                              foregroundColor: WidgetStateProperty.all(
-                                _selectedVideoPath != null ? LinkedInTheme.successGreen : LinkedInTheme.primaryBlue,
-                              ),
-                              side: WidgetStateProperty.all(
-                                BorderSide(
-                                  color: _selectedVideoPath != null ? LinkedInTheme.successGreen : LinkedInTheme.primaryBlue,
-                                ),
-                              ),
+                              foregroundColor: WidgetStateProperty.all(LinkedInTheme.primaryBlue),
+                              side: WidgetStateProperty.all(const BorderSide(color: LinkedInTheme.primaryBlue)),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    if (_selectedImagePath != null || _selectedVideoPath != null) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: LinkedInTheme.backgroundGray,
-                          borderRadius: BorderRadius.circular(4),
+                    
+                    if (_selectedImages.isNotEmpty || _selectedVideos.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      // Images List
+                      if (_selectedImages.isNotEmpty) ...[
+                        const Text('Selected Images:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 100,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _selectedImages.length,
+                            separatorBuilder: (_, __) => const SizedBox(width: 8),
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: FileImage(File(_selectedImages[index].path)),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 4,
+                                    top: 4,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedImages.removeAt(index);
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.close, color: Colors.white, size: 12),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                        child: Row(
-                          children: [
-                            if (_selectedImagePath != null) ...[
-                              const Icon(Icons.image, color: LinkedInTheme.successGreen, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Image: ${_selectedImagePath!.split('/').last}',
-                                  style: LinkedInTheme.bodySmall,
-                                ),
+                        const SizedBox(height: 16),
+                      ],
+                      // Videos List
+                      if (_selectedVideos.isNotEmpty) ...[
+                        const Text('Selected Videos:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: _selectedVideos.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final video = entry.value;
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: LinkedInTheme.backgroundGray,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.grey.shade300),
                               ),
-                              IconButton(
-                                onPressed: () => setState(() {
-                                  _selectedImagePath = null;
-                                  _selectedImage = null;
-                                }),
-                                icon: const Icon(Icons.close, size: 16),
-                                constraints: const BoxConstraints(),
-                                padding: EdgeInsets.zero,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.videocam, color: LinkedInTheme.primaryBlue),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Video ${index + 1}: ${video.name}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: LinkedInTheme.bodySmall,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedVideos.removeAt(index);
+                                      });
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
-                            if (_selectedVideoPath != null) ...[
-                              const Icon(Icons.videocam, color: LinkedInTheme.successGreen, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Video: ${_selectedVideoPath!.split('/').last}',
-                                  style: LinkedInTheme.bodySmall,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => setState(() {
-                                  _selectedVideoPath = null;
-                                  _selectedVideo = null;
-                                }),
-                                icon: const Icon(Icons.close, size: 16),
-                                constraints: const BoxConstraints(),
-                                padding: EdgeInsets.zero,
-                              ),
-                            ],
-                          ],
+                            );
+                          }).toList(),
                         ),
-                      ),
+                      ],
                     ],
+
                     const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
@@ -234,8 +275,8 @@ class _PostProblemScreenState extends State<PostProblemScreen> {
         authorId: dataService.currentUserId,
         authorName: dataService.currentUserName,
         createdAt: DateTime.now(),
-        imageUrl: _selectedImagePath,
-        videoUrl: _selectedVideoPath,
+        imageUrls: _selectedImages.map((e) => e.path).toList(),
+        videoUrls: _selectedVideos.map((e) => e.path).toList(),
       );
 
       dataService.addProblem(problem);
@@ -243,98 +284,34 @@ class _PostProblemScreenState extends State<PostProblemScreen> {
     }
   }
 
-  void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showVideoSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.videocam),
-              title: const Text('Camera'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickVideo(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.video_library),
-              title: const Text('Gallery'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickVideo(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _pickImage(ImageSource source) async {
+  Future<void> _pickImages() async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: source,
+      final List<XFile> images = await _picker.pickMultiImage(
         maxWidth: 1920,
         maxHeight: 1080,
         imageQuality: 85,
       );
-      if (image != null) {
+      if (images.isNotEmpty) {
         setState(() {
-          _selectedImage = File(image.path);
-          _selectedImagePath = image.path;
-          _selectedVideo = null;
-          _selectedVideoPath = null;
+          _selectedImages.addAll(images);
         });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking image: $e')),
+        SnackBar(content: Text('Error picking images: $e')),
       );
     }
   }
 
-  void _pickVideo(ImageSource source) async {
+  Future<void> _pickVideo() async {
     try {
+      // Pick a single video and add to list
       final XFile? video = await _picker.pickVideo(
-        source: source,
+        source: ImageSource.gallery,
       );
       if (video != null) {
         setState(() {
-          _selectedVideo = File(video.path);
-          _selectedVideoPath = video.path;
-          _selectedImage = null;
-          _selectedImagePath = null;
+          _selectedVideos.add(video);
         });
       }
     } catch (e) {

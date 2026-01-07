@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/linkedin_theme.dart';
-import 'home_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     });
   }
@@ -43,51 +43,51 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LinkedInTheme.backgroundGray,
-      body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  padding: const EdgeInsets.all(40),
-                  decoration: LinkedInTheme.cardDecoration,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'assets/images/image copy 4.png',
-                        height: 80,
-                        width: 80,
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'BrainLift',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: LinkedInTheme.textPrimary,
-                          letterSpacing: 1.2,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [LinkedInTheme.primaryBlue, LinkedInTheme.darkBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _fadeAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    padding: const EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          spreadRadius: 5,
                         ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/images/image copy 4.png',
+                      height: 80,
+                      width: 80,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.lightbulb_rounded, 
+                        size: 80, 
+                        color: Colors.white
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Problem Solving Platform',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: LinkedInTheme.textSecondary,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

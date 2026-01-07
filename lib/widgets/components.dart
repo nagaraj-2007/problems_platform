@@ -1,28 +1,34 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../utils/linkedin_theme.dart';
+import '../services/data_service.dart';
 
-class ProblemCard extends StatelessWidget {
+class ProblemCard extends StatefulWidget {
   final Problem problem;
   final VoidCallback? onTap;
 
   const ProblemCard({super.key, required this.problem, this.onTap});
 
   @override
+  State<ProblemCard> createState() => _ProblemCardState();
+}
+
+class _ProblemCardState extends State<ProblemCard> {
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: LinkedInTheme.cardDecoration,
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         borderRadius: BorderRadius.circular(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (problem.imageUrl != null)
+            if (widget.problem.imageUrls.isNotEmpty)
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                 child: Image.asset(
-                  problem.imageUrl!,
+                  widget.problem.imageUrls.first,
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -44,24 +50,24 @@ class ProblemCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      CategoryTag(category: problem.category),
+                      CategoryTag(category: widget.problem.category),
                       const Spacer(),
                       Text(
-                        _formatDate(problem.createdAt),
+                        _formatDate(widget.problem.createdAt),
                         style: LinkedInTheme.bodySmall,
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    problem.title,
+                    widget.problem.title,
                     style: LinkedInTheme.heading3,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    problem.context,
+                    widget.problem.context,
                     style: LinkedInTheme.bodyMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -73,7 +79,7 @@ class ProblemCard extends StatelessWidget {
                         radius: 12,
                         backgroundColor: LinkedInTheme.primaryBlue,
                         child: Text(
-                          problem.authorName[0],
+                          widget.problem.authorName[0],
                           style: const TextStyle(
                             color: LinkedInTheme.cardWhite,
                             fontSize: 10,
@@ -83,20 +89,48 @@ class ProblemCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        problem.authorName,
+                        widget.problem.authorName,
                         style: LinkedInTheme.bodySmall.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const Spacer(),
-                      _buildStatChip(
-                        icon: Icons.visibility_outlined,
-                        label: '${problem.viewCount}',
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(height: 1, color: LinkedInTheme.borderGray),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _buildActionButton(
+                        icon: widget.problem.isLiked ? Icons.favorite : Icons.favorite_border,
+                        label: '${widget.problem.likeCount}',
+                        color: widget.problem.isLiked ? LinkedInTheme.warningOrange : LinkedInTheme.textSecondary,
+                        onTap: () {
+                          setState(() {
+                            DataService().likeProblem(widget.problem.id);
+                          });
+                        },
                       ),
-                      const SizedBox(width: 8),
-                      _buildStatChip(
+                      const SizedBox(width: 16),
+                      _buildActionButton(
                         icon: Icons.lightbulb_outline,
-                        label: '${problem.planCount}',
+                        label: '${widget.problem.planCount} Plans',
+                        color: LinkedInTheme.textSecondary,
+                        onTap: () {
+                           if (widget.onTap != null) widget.onTap!();
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      _buildActionButton(
+                        icon: Icons.share_outlined,
+                        label: 'Share',
+                        color: LinkedInTheme.textSecondary,
+                        onTap: () {
+                          // Share functionality
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Share functionality coming soon')),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -109,27 +143,32 @@ class ProblemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatChip({required IconData icon, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: LinkedInTheme.backgroundGray,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: LinkedInTheme.textSecondary),
-          const SizedBox(width: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              color: LinkedInTheme.textSecondary,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -143,11 +182,16 @@ class ProblemCard extends StatelessWidget {
   }
 }
 
-class PlanCard extends StatelessWidget {
+class PlanCard extends StatefulWidget {
   final Plan plan;
 
   const PlanCard({super.key, required this.plan});
 
+  @override
+  State<PlanCard> createState() => _PlanCardState();
+}
+
+class _PlanCardState extends State<PlanCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -193,7 +237,7 @@ class PlanCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Plan by ${plan.authorName}',
+                      'Plan by ${widget.plan.authorName}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -201,11 +245,11 @@ class PlanCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  RatingDisplay(rating: plan.averageRating, count: plan.ratingCount),
+                  RatingDisplay(rating: widget.plan.averageRating, count: widget.plan.ratingCount),
                 ],
               ),
               const SizedBox(height: 20),
-              ...plan.steps.asMap().entries.map((entry) {
+              ...widget.plan.steps.asMap().entries.map((entry) {
                 final index = entry.key;
                 final step = entry.value;
                 return Container(
@@ -235,7 +279,7 @@ class PlanCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                      child: Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -264,8 +308,64 @@ class PlanCard extends StatelessWidget {
                   ),
                 );
               }),
+              const Divider(height: 24, color: Color(0xFFE2E8F0)),
+              Row(
+                children: [
+                  _buildActionButton(
+                    icon: widget.plan.isLiked ? Icons.favorite : Icons.favorite_border,
+                    label: '${widget.plan.likeCount} Likes',
+                    color: widget.plan.isLiked ? LinkedInTheme.warningOrange :  const Color(0xFF64748B),
+                    onTap: () {
+                      setState(() {
+                         DataService().likePlan(widget.plan.id);
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 24),
+                  _buildActionButton(
+                    icon: Icons.share_outlined,
+                    label: 'Share',
+                    color: const Color(0xFF64748B),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Share functionality coming soon')),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );

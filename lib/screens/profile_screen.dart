@@ -7,6 +7,7 @@ import 'problem_preview_screen.dart';
 import 'post_problem_screen.dart';
 import 'category_overview_screen.dart';
 import 'problem_list_screen.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -64,6 +65,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     MaterialPageRoute(builder: (context) => const ProblemListScreen()),
                   );
                   break;
+                case 'logout':
+                  _showLogoutDialog();
+                  break;
               }
             },
             itemBuilder: (context) => [
@@ -94,6 +98,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     Icon(Icons.list, color: LinkedInTheme.textPrimary),
                     SizedBox(width: 8),
                     Text('All Problems'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, color: LinkedInTheme.warningOrange),
+                    SizedBox(width: 8),
+                    Text('Logout', style: TextStyle(color: LinkedInTheme.warningOrange)),
                   ],
                 ),
               ),
@@ -572,6 +586,34 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             },
             style: TextButton.styleFrom(foregroundColor: LinkedInTheme.warningOrange),
             child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: LinkedInTheme.warningOrange),
+            child: const Text('Logout'),
           ),
         ],
       ),

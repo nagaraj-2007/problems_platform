@@ -9,9 +9,12 @@ class Problem {
   final int planCount;
   final double averageRating;
   final int reviewCount;
-  final int viewCount;
-  final String? imageUrl;
-  final String? videoUrl;
+  final List<String> imageUrls;
+  final List<String> videoUrls;
+  
+  // New input fields
+  int likeCount;
+  bool isLiked;
 
   Problem({
     required this.id,
@@ -24,9 +27,10 @@ class Problem {
     this.planCount = 0,
     this.averageRating = 0.0,
     this.reviewCount = 0,
-    this.viewCount = 0,
-    this.imageUrl,
-    this.videoUrl,
+    this.imageUrls = const [],
+    this.videoUrls = const [],
+    this.likeCount = 0,
+    this.isLiked = false,
   });
 }
 
@@ -39,6 +43,10 @@ class Plan {
   final DateTime createdAt;
   final double averageRating;
   final int ratingCount;
+  
+  // New input fields
+  int likeCount;
+  bool isLiked;
 
   Plan({
     required this.id,
@@ -49,6 +57,8 @@ class Plan {
     required this.createdAt,
     this.averageRating = 0.0,
     this.ratingCount = 0,
+    this.likeCount = 0,
+    this.isLiked = false,
   });
 }
 

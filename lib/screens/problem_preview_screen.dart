@@ -33,9 +33,9 @@ class ProblemPreviewScreen extends StatelessWidget {
             // Image/Video Section
             Container(
               height: MediaQuery.of(context).size.height * 0.6,
-              child: problem.imageUrl != null
+              child: problem.imageUrls.isNotEmpty
                   ? Image.asset(
-                      problem.imageUrl!,
+                      problem.imageUrls.first,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
